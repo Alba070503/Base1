@@ -1,0 +1,14 @@
+{
+  "name": "tecnobolivia-ventas",
+  "version": "1.0.0",
+  "description": "Sistema interactivo de ventas para TecnoBolivia S.R.L. - Proyecto DER",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
