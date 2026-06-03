@@ -36,7 +36,32 @@ function formatearFecha() {
   return hoy.toISOString().slice(0, 10);
 }
 
-// ---------- ABMC ----------
+// ========== NUEVAS FUNCIONES PARA MOSTRAR LISTAS ==========
+function mostrarClientes() {
+  if (clientes.length === 0) {
+    console.log("📭 No hay clientes registrados.");
+    return;
+  }
+  console.log("\n📋 LISTA DE CLIENTES:");
+  console.log("ID | Nombre completo | CI | Teléfono | Email");
+  clientes.forEach(c => {
+    console.log(`${c.idCliente} | ${c.nombre} ${c.apellidos} | ${c.ci} | ${c.telefono} | ${c.email}`);
+  });
+}
+
+function mostrarProductos() {
+  if (productos.length === 0) {
+    console.log("📭 No hay productos registrados.");
+    return;
+  }
+  console.log("\n🛒 LISTA DE PRODUCTOS:");
+  console.log("ID | Nombre | Precio (Bs) | Stock | Descripción");
+  productos.forEach(p => {
+    console.log(`${p.idProducto} | ${p.nombre} | ${p.precioUnitario} | ${p.stock} | ${p.descripcion || '-'}`);
+  });
+}
+
+// ========== ABMC MEJORADAS (muestran listas después de crear) ==========
 async function crearCliente() {
   console.log("\n--- NUEVO CLIENTE ---");
   const nombre = await preguntar("Nombre: ");
@@ -48,7 +73,8 @@ async function crearCliente() {
   const nuevoId = clientes.length ? Math.max(...clientes.map(c => c.idCliente)) + 1 : 1;
   const nuevo = { idCliente: nuevoId, nombre, apellidos, ci, direccion, telefono, email };
   clientes.push(nuevo);
-  console.log(`✅ Cliente creado con ID ${nuevoId}`);
+  console.log(`✅ Cliente "${nombre} ${apellidos}" creado con ID ${nuevoId}`);
+  mostrarClientes(); // 👈 Ahora muestra la lista actualizada
 }
 
 async function crearProducto() {
@@ -60,14 +86,15 @@ async function crearProducto() {
   const nuevoId = productos.length ? Math.max(...productos.map(p => p.idProducto)) + 1 : 1;
   const nuevo = { idProducto: nuevoId, nombre, descripcion, precioUnitario: precio, stock };
   productos.push(nuevo);
-  console.log(`✅ Producto creado con ID ${nuevoId}`);
+  console.log(`✅ Producto "${nombre}" creado con ID ${nuevoId}`);
+  mostrarProductos(); // 👈 Ahora muestra la lista actualizada
 }
 
 async function realizarVenta() {
   console.log("\n--- REALIZAR VENTA ---");
-  console.log("Clientes disponibles:");
-  clientes.forEach(c => console.log(`ID: ${c.idCliente} - ${c.nombre} ${c.apellidos}`));
-  const idCliente = parseInt(await preguntar("ID del cliente: "));
+  // Mostrar clientes disponibles (tabla formateada)
+  mostrarClientes();
+  const idCliente = parseInt(await preguntar("\nID del cliente que compra: "));
   if (!clientes.find(c => c.idCliente === idCliente)) {
     console.log("❌ Cliente no existe");
     return;
@@ -85,8 +112,8 @@ async function realizarVenta() {
 
   let seguir = true;
   while (seguir) {
-    console.log("\n--- PRODUCTOS DISPONIBLES ---");
-    productos.forEach(p => console.log(`ID: ${p.idProducto} | ${p.nombre} | Bs ${p.precioUnitario} | Stock: ${p.stock}`));
+    // Mostrar productos disponibles (tabla formateada)
+    mostrarProductos();
     const idProducto = parseInt(await preguntar("ID del producto (0 para terminar): "));
     if (idProducto === 0) break;
     const producto = productos.find(p => p.idProducto === idProducto);
@@ -139,9 +166,8 @@ function listarVentas() {
 }
 
 async function actualizarProducto() {
-  console.log("\n--- ACTUALIZAR PRODUCTO ---");
-  productos.forEach(p => console.log(`ID: ${p.idProducto} | ${p.nombre} | Precio: ${p.precioUnitario} | Stock: ${p.stock}`));
-  const id = parseInt(await preguntar("ID del producto a actualizar: "));
+  mostrarProductos(); // Muestra los productos antes de actualizar
+  const id = parseInt(await preguntar("\nID del producto a actualizar: "));
   const prod = productos.find(p => p.idProducto === id);
   if (!prod) {
     console.log("❌ Producto no existe");
@@ -152,6 +178,7 @@ async function actualizarProducto() {
   const nuevoStock = await preguntar(`Nuevo stock (actual ${prod.stock}): `);
   if (nuevoStock) prod.stock = parseInt(nuevoStock);
   console.log(`✅ Producto actualizado: ${prod.nombre}`);
+  mostrarProductos(); // Muestra la lista actualizada después de modificar
 }
 
 async function eliminarVenta() {
